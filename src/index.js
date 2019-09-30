@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 import memoize from 'lodash.memoize';
 import reduce from 'lodash.reduce';
@@ -7,61 +6,9 @@ import startsWith from 'lodash.startswith';
 import classNames from 'classnames';
 
 import countryData from './country_data.js';
-import './style.less';
+// import './style.less';
 
 class PhoneInput extends React.Component {
-  static propTypes = {
-    excludeCountries: PropTypes.arrayOf(PropTypes.string),
-    onlyCountries: PropTypes.arrayOf(PropTypes.string),
-    preferredCountries: PropTypes.arrayOf(PropTypes.string),
-    defaultCountry: PropTypes.string,
-
-    value: PropTypes.string,
-    placeholder: PropTypes.string,
-    searchPlaceholder: PropTypes.string,
-    disabled: PropTypes.bool,
-
-    containerStyle: PropTypes.object,
-    inputStyle: PropTypes.object,
-    buttonStyle: PropTypes.object,
-    dropdownStyle: PropTypes.object,
-    searchStyle: PropTypes.object,
-
-    containerClass: PropTypes.string,
-    inputClass: PropTypes.string,
-    buttonClass: PropTypes.string,
-    dropdownClass: PropTypes.string,
-    searchClass: PropTypes.string,
-
-    autoFormat: PropTypes.bool,
-    disableAreaCodes: PropTypes.bool,
-    disableCountryCode: PropTypes.bool,
-    disableDropdown: PropTypes.bool,
-    enableLongNumbers: PropTypes.bool,
-    countryCodeEditable: PropTypes.bool,
-    enableSearchField: PropTypes.bool,
-    disableSearchIcon: PropTypes.bool,
-
-    regions: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.arrayOf(PropTypes.string)
-    ]),
-
-    inputExtraProps: PropTypes.object,
-    localization: PropTypes.object,
-    masks: PropTypes.object,
-    areaCodes: PropTypes.object,
-
-    preserveOrder: PropTypes.arrayOf(PropTypes.string),
-    renderStringAsFlag: PropTypes.string,
-
-    onChange: PropTypes.func,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onClick: PropTypes.func,
-    onKeyDown: PropTypes.func,
-    isValid: PropTypes.func,
-  }
 
   static defaultProps = {
     excludeCountries: [],
@@ -436,8 +383,8 @@ class PhoneInput extends React.Component {
       pattern = patternArg;
     }
 
-    if (!text || text.length === 0) {
-      return disableCountryCode ? '' : '+';
+    if (!text || text.length === 0 || text === '+') {
+      return '';
     }
 
     // for all strings with length less than 3, just return it (1, 2 etc.)
@@ -532,6 +479,7 @@ class PhoneInput extends React.Component {
   }
 
   handleInput = (e) => {
+    // const currentValue = this.state.formattedNumber;
     let formattedNumber = this.props.disableCountryCode ? '' : '+';
     let newSelectedCountry = this.state.selectedCountry;
     let freezeSelection = this.state.freezeSelection;
@@ -560,20 +508,18 @@ class PhoneInput extends React.Component {
       e.returnValue = false;
     }
 
-    if (e.target.value.length > 0) {
-      // before entering the number in new format, lets check if the dial code now matches some other country
-      const inputNumber = e.target.value.replace(/\D/g, '');
+    // before entering the number in new format, lets check if the dial code now matches some other country
+    const inputNumber = e.target.value.replace(/\D/g, '');
 
-      // we don't need to send the whole number to guess the country... only the first 6 characters are enough
-      // the guess country function can then use memoization much more effectively since the set of input it
-      // gets has drastically reduced
-      if (!this.state.freezeSelection || this.state.selectedCountry.dialCode.length > inputNumber.length) {
-        newSelectedCountry = this.guessSelectedCountry(inputNumber.substring(0, 6), this.state.onlyCountries, this.state.defaultCountry);
-        freezeSelection = false;
-      }
-      formattedNumber = this.formatNumber(inputNumber, newSelectedCountry.format); // remove all non numerals from the input
-      newSelectedCountry = newSelectedCountry.dialCode ? newSelectedCountry : this.state.selectedCountry;
+    // we don't need to send the whole number to guess the country... only the first 6 characters are enough
+    // the guess country function can then use memoization much more effectively since the set of input it
+    // gets has drastically reduced
+    if (!this.state.freezeSelection || this.state.selectedCountry.dialCode.length > inputNumber.length) {
+      newSelectedCountry = this.guessSelectedCountry(inputNumber.substring(0, 6), this.state.onlyCountries, this.state.defaultCountry);
+      freezeSelection = false;
     }
+    formattedNumber = this.formatNumber(inputNumber, newSelectedCountry.format); // remove all non numerals from the input
+    newSelectedCountry = newSelectedCountry.dialCode ? newSelectedCountry : this.state.selectedCountry;
 
     let caretPosition = e.target.selectionStart;
     const oldFormattedText = this.state.formattedNumber;
