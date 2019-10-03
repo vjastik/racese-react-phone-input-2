@@ -6,7 +6,7 @@ import startsWith from 'lodash.startswith';
 import classNames from 'classnames';
 
 import countryData from './country_data.js';
-// import './style.less';
+import './style.less';
 
 class PhoneInput extends React.Component {
 
@@ -882,4 +882,34 @@ class PhoneInput extends React.Component {
   }
 }
 
-export default PhoneInput;
+class Helper {
+  allCountries = countryData.allCountries;
+
+  takeCountryData = memoize((phone, onlyData, defaultCountry) => {
+    const inputNumber = phone
+      .replace(/\D/g, '')
+      .substring(0, 6);
+    const onlyCountries = onlyData || this.allCountries;
+
+    const secondBestGuess = onlyCountries.find(o => o.iso2 == defaultCountry) || {};
+    if (inputNumber.trim() === '') return secondBestGuess;
+
+    const bestGuess = onlyCountries.reduce((selectedCountry, country) => {
+      if (startsWith(inputNumber, country.dialCode)) {
+        if (country.dialCode.length > selectedCountry.dialCode.length) {
+          return country;
+        }
+        if (country.dialCode.length === selectedCountry.dialCode.length && country.priority < selectedCountry.priority) {
+          return country;
+        }
+      }
+      return selectedCountry;
+    }, {dialCode: '', priority: 10001});
+
+    if (!bestGuess.name) return secondBestGuess;
+    return bestGuess;
+  })
+}
+const helper = new Helper();
+
+export { PhoneInput, helper };
