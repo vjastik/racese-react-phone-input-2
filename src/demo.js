@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import PhoneInput from './index';
-
+import { PhoneInput } from './index';
 
 class Demo extends React.Component {
   state = { defaultCountry: 'br', value: '12345',

@@ -6,7 +6,7 @@ import startsWith from 'lodash.startswith';
 import classNames from 'classnames';
 
 import countryData from './country_data.js';
-import './style.less';
+// import './style.less';
 
 class PhoneInput extends React.Component {
 
@@ -314,7 +314,9 @@ class PhoneInput extends React.Component {
     // otherwise use logic for finding country based on country prefix.
     if (!startsWith(inputNumber, '+')) {
       newSelectedCountry = this.state.selectedCountry || onlyCountries.find(o => o.iso2 == defaultCountry);
-      const dialCode = newSelectedCountry && !startsWith(inputNumber.replace(/\D/g, ''), newSelectedCountry.dialCode) ? newSelectedCountry.dialCode : '';
+      const dialCode = newSelectedCountry && !startsWith(inputNumber.replace(/\D/g, ''), newSelectedCountry.dialCode)
+        ? newSelectedCountry.dialCode || ''
+        : '';
       formattedNumber = this.formatNumber(
         (this.props.disableCountryCode ? '' : dialCode) + inputNumber.replace(/\D/g, ''),
         newSelectedCountry ? newSelectedCountry.format : undefined
