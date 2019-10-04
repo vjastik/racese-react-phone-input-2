@@ -1,6 +1,6 @@
 {
   "name": "racese-react-phone-input-2",
-  "version": "1.0.16",
+  "version": "1.0.18",
   "description": "A react component to format phone numbers",
   "main": "dist/lib.js",
   "scripts": {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { PhoneInput } from './index';
+import {PREFERED_COUNTRIES} from "constants";
 
 class Demo extends React.Component {
   state = { defaultCountry: 'br', value: '12345',
@@ -17,7 +18,12 @@ class Demo extends React.Component {
     }
   }
 
+  handleForceUpdate = () => {
+    this.forceUpdate()
+  }
+
   render() {
+    console.log('render');
     return (
       <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: '15px', padding: '10px 25px' }}>
         <style dangerouslySetInnerHTML={{__html: `
@@ -36,6 +42,9 @@ class Demo extends React.Component {
           }
         `}} />
         <div style={{ display: 'inline-block', verticalAlign: 'top' }}>
+          <button onClick={this.handleForceUpdate}>
+            Force update
+          </button>
           <p>v1.2.1</p>
           <p>Exclude countries (usa, canada)</p>
           <PhoneInput
