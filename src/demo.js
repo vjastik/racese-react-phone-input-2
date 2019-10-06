@@ -23,7 +23,6 @@ class Demo extends React.Component {
   }
 
   render() {
-    console.log('render');
     return (
       <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: '15px', padding: '10px 25px' }}>
         <style dangerouslySetInnerHTML={{__html: `
@@ -67,7 +66,7 @@ class Demo extends React.Component {
           <p>v2</p>
           <p>Auto country detect by value</p>
           <PhoneInput
-            value='+3802343252'
+            value=''
           />
           <p>Disabled area codes with disableAreaCodes</p>
           <PhoneInput

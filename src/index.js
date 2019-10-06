@@ -3,6 +3,7 @@ import debounce from 'lodash.debounce';
 import memoize from 'lodash.memoize';
 import reduce from 'lodash.reduce';
 import startsWith from 'lodash.startswith';
+import isEmpty from 'lodash/isEmpty';
 import classNames from 'classnames';
 
 import countryData from './country_data.js';
@@ -328,6 +329,11 @@ class PhoneInput extends React.Component {
       formattedNumber = this.formatNumber(inputNumber, newSelectedCountry.format);
     }
 
+    if (isEmpty(value) && !defaultCountry) {
+      formattedNumber = '';
+      newSelectedCountry = {};
+    }
+
     this.setState({ selectedCountry: newSelectedCountry, formattedNumber });
   }
 
@@ -522,6 +528,11 @@ class PhoneInput extends React.Component {
     }
     formattedNumber = this.formatNumber(inputNumber, newSelectedCountry.format); // remove all non numerals from the input
     newSelectedCountry = newSelectedCountry.dialCode ? newSelectedCountry : this.state.selectedCountry;
+
+    if (isEmpty(inputNumber)) {
+      newSelectedCountry = {};
+      freezeSelection = false;
+    }
 
     let caretPosition = e.target.selectionStart;
     const oldFormattedText = this.state.formattedNumber;
@@ -888,6 +899,10 @@ class Helper {
   allCountries = countryData.allCountries;
 
   takeCountryData = memoize((phone, onlyData, defaultCountry) => {
+    if (typeof phone !== 'string') {
+      return {};
+    }
+
     const inputNumber = phone
       .replace(/\D/g, '')
       .substring(0, 6);
