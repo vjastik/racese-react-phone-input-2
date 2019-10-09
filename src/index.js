@@ -314,7 +314,10 @@ class PhoneInput extends React.Component {
     // if inputNumber does not start with '+', then use default country's dialing prefix,
     // otherwise use logic for finding country based on country prefix.
     if (!startsWith(inputNumber, '+')) {
-      newSelectedCountry = this.state.selectedCountry || onlyCountries.find(o => o.iso2 == defaultCountry);
+      newSelectedCountry = helper.takeCountryData(inputNumber.replace(/\D/g, ''));
+      if (!newSelectedCountry) {
+        newSelectedCountry = this.state.selectedCountry || onlyCountries.find(o => o.iso2 == defaultCountry);
+      }
       const dialCode = newSelectedCountry && !startsWith(inputNumber.replace(/\D/g, ''), newSelectedCountry.dialCode)
         ? newSelectedCountry.dialCode || ''
         : '';
