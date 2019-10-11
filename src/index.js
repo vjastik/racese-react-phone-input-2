@@ -573,8 +573,20 @@ class PhoneInput extends React.Component {
     const nextSelectedCountry = this.state.onlyCountries.find(o => o == country);
     if (!nextSelectedCountry) return;
 
-    const unformattedNumber = this.state.formattedNumber.replace(' ', '').replace('(', '').replace(')', '').replace('-', '');
-    const newNumber = unformattedNumber.length > 1 ? unformattedNumber.replace(currentSelectedCountry.dialCode, nextSelectedCountry.dialCode) : nextSelectedCountry.dialCode;
+    const unformattedNumber = this.state.formattedNumber
+      .replace(' ', '')
+      .replace('(', '')
+      .replace(')', '')
+      .replace('-', '');
+    let newNumber = '';
+
+    if (unformattedNumber.length > 1) {
+      newNumber = currentSelectedCountry.dialCode
+        ? unformattedNumber.replace(currentSelectedCountry.dialCode, nextSelectedCountry.dialCode)
+        : `${nextSelectedCountry.dialCode}${unformattedNumber.replace('+', '')}`
+    } else {
+      newNumber = nextSelectedCountry.dialCode;
+    }
     const formattedNumber = this.formatNumber(newNumber.replace(/\D/g, ''), nextSelectedCountry.format);
 
     this.setState({
