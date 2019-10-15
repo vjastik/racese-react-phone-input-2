@@ -581,9 +581,19 @@ class PhoneInput extends React.Component {
     let newNumber = '';
 
     if (unformattedNumber.length > 1) {
-      newNumber = currentSelectedCountry.dialCode
-        ? unformattedNumber.replace(currentSelectedCountry.dialCode, nextSelectedCountry.dialCode)
-        : `${nextSelectedCountry.dialCode}${unformattedNumber.replace('+', '')}`
+      if (currentSelectedCountry.dialCode) {
+        newNumber = unformattedNumber.replace(currentSelectedCountry.dialCode, nextSelectedCountry.dialCode)
+      } else {
+        const valueWithoutPlus = unformattedNumber.replace('+', '');
+        const preferredNumber = `${nextSelectedCountry.dialCode}${valueWithoutPlus}`;
+
+        if (preferredNumber > 15) {
+          const cutNumber = valueWithoutPlus.slice(nextSelectedCountry.dialCode.length, valueWithoutPlus.length);
+          newNumber = `${nextSelectedCountry.dialCode}${cutNumber}`
+        } else {
+          newNumber = preferredNumber;
+        }
+      }
     } else {
       newNumber = nextSelectedCountry.dialCode;
     }
