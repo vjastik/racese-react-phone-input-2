@@ -4,6 +4,7 @@ import memoize from 'lodash.memoize';
 import reduce from 'lodash.reduce';
 import startsWith from 'lodash.startswith';
 import isEmpty from 'lodash/isEmpty';
+import isString from 'lodash/isString';
 import classNames from 'classnames';
 
 import countryData from './country_data.js';
@@ -507,7 +508,7 @@ class PhoneInput extends React.Component {
     }
 
     // Does not exceed 15 digit phone number limit
-    if (e.target.value.replace(/\D/g, '').length > 15) return;
+    // if (e.target.value.replace(/\D/g, '').length > 15) return;
 
     // if the input is the same as before, must be some special key like enter etc.
     if (e.target.value === this.state.formattedNumber) return;
@@ -585,14 +586,7 @@ class PhoneInput extends React.Component {
         newNumber = unformattedNumber.replace(currentSelectedCountry.dialCode, nextSelectedCountry.dialCode)
       } else {
         const valueWithoutPlus = unformattedNumber.replace('+', '');
-        const preferredNumber = `${nextSelectedCountry.dialCode}${valueWithoutPlus}`;
-
-        if (preferredNumber > 15) {
-          const cutNumber = valueWithoutPlus.slice(nextSelectedCountry.dialCode.length, valueWithoutPlus.length);
-          newNumber = `${nextSelectedCountry.dialCode}${cutNumber}`
-        } else {
-          newNumber = preferredNumber;
-        }
+        newNumber = `${nextSelectedCountry.dialCode}${valueWithoutPlus}`;
       }
     } else {
       newNumber = nextSelectedCountry.dialCode;
@@ -953,8 +947,50 @@ class Helper {
 
     if (!bestGuess.name) return secondBestGuess;
     return bestGuess;
-  })
+  });
+
+  isValidLength = (textToFormat) => {
+    let text = textToFormat;
+
+    if (text && isString(text)) {
+      text = text.replace(/\D/g, '')
+    } else {
+      return false;
+    }
+
+    const pattern = this.takeCountryData(text.replace(/\D/g, '')).format;
+
+    if (pattern) {
+      const formattedObject = reduce(pattern, (acc, character) => {
+        if (acc.remainingText.length === 0) {
+          return acc;
+        }
+
+        if (character !== '.') {
+          return {
+            formattedText: acc.formattedText + character,
+            remainingText: acc.remainingText
+          };
+        }
+
+        const [head, ...tail] = acc.remainingText;
+
+        return {
+          formattedText: acc.formattedText + head,
+          remainingText: tail
+        };
+      }, {
+        formattedText: '',
+        remainingText: text.split('')
+      });
+
+      return isEmpty(formattedObject.remainingText);
+    }
+
+    return text.length <= 15;
+  };
 }
 const helper = new Helper();
+// window.isValidLength = helper.isValidLength;
 
 export { PhoneInput, helper };
