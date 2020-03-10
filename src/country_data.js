@@ -460,8 +460,7 @@ const rawAllCountries = [
     'Finland',
     ['europe', 'european-union'],
     'fi',
-    '358',
-    '+... .. ... .. ..'
+    '358'
   ],
   [
     'France',
