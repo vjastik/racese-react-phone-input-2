@@ -383,7 +383,7 @@ class PhoneInput extends React.Component {
     }
   }
 
-  formatNumber = (text, patternArg) => {
+  formatNumber = (text, patternArg, isShortHandNumber = false) => {
     const { disableCountryCode, enableLongNumbers, autoFormat } = this.props;
 
     let pattern;
@@ -402,7 +402,7 @@ class PhoneInput extends React.Component {
     // for all strings with length less than 3, just return it (1, 2 etc.)
     // also return the same text if the selected country has no fixed format
     if ((text && text.length < 2) || !pattern || !autoFormat) {
-      return disableCountryCode ? text : `+${text}`;
+      return disableCountryCode || isShortHandNumber ? text : `+${text}`;
     }
 
     const formattedObject = reduce(pattern, (acc, character) => {
@@ -492,7 +492,11 @@ class PhoneInput extends React.Component {
 
   handleInput = (e) => {
     // const currentValue = this.state.formattedNumber;
-    let formattedNumber = this.props.disableCountryCode ? '' : '+';
+
+    // if user enters 0, replace it later with country code
+    const  isShortHandNumber = e.target.value[0] === '0'
+
+    let formattedNumber = this.props.disableCountryCode || isShortHandNumber ? '' : '+';
     let newSelectedCountry = this.state.selectedCountry;
     let freezeSelection = this.state.freezeSelection;
 
@@ -530,7 +534,7 @@ class PhoneInput extends React.Component {
       newSelectedCountry = this.guessSelectedCountry(inputNumber.substring(0, 6), this.state.onlyCountries, this.state.defaultCountry);
       freezeSelection = false;
     }
-    formattedNumber = this.formatNumber(inputNumber, newSelectedCountry.format); // remove all non numerals from the input
+    formattedNumber = this.formatNumber(inputNumber, newSelectedCountry.format, isShortHandNumber); // remove all non numerals from the input
     newSelectedCountry = newSelectedCountry.dialCode ? newSelectedCountry : this.state.selectedCountry;
 
     if (isEmpty(inputNumber)) {
@@ -574,12 +578,15 @@ class PhoneInput extends React.Component {
     const nextSelectedCountry = this.state.onlyCountries.find(o => o == country);
     if (!nextSelectedCountry) return;
 
-    const unformattedNumber = this.state.formattedNumber
+    let unformattedNumber = this.state.formattedNumber
       .replace(' ', '')
       .replace('(', '')
       .replace(')', '')
       .replace('-', '');
     let newNumber = '';
+
+    // When user selects country, replace 0 with country code
+    unformattedNumber = unformattedNumber.replace(/^0/, '')
 
     if (unformattedNumber.length > 1) {
       if (currentSelectedCountry.dialCode) {
